@@ -1,1 +1,3 @@
-global using Microsoft.VisualStudio.TestTools.UnitTesting;
+global using Xunit;
+global using DominoStones.Shared;
+global using DominoStones.Shared.Model;

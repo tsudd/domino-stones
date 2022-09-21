@@ -1,0 +1,5 @@
+{
+    "dotnet-test-explorer.testProjectPath": "Test/*Test.csproj",
+    "SAP HANA Database Explorer.displaySapWebAnalyticsStartupNotification": false,
+    "SAP HANA Database Explorer.enableSapWebAnalytics": false
+}
