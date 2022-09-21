@@ -29,19 +29,44 @@ public class Domino
 
     public bool TryMatchTo(
         Domino otherStone,
-        out List<DominoMatch> firstHalfMatches)
+        out List<DominoMatch> matches,
+        int baseIndex = -1,
+        int otherStoneBaseIndex = -1)
     {
-        firstHalfMatches = new List<DominoMatch>();
+        matches = new List<DominoMatch>();
         if (_halfs.Item1 == otherStone.GetHalfValue(DominoHalfs.First))
-            firstHalfMatches.Add(new DominoMatch(this, otherStone, DominoHalfs.First, DominoHalfs.First));
+            matches.Add(new DominoMatch(
+                this,
+                otherStone,
+                DominoHalfs.First,
+                DominoHalfs.First,
+                baseIndex,
+                otherStoneBaseIndex));
         if (_halfs.Item2 == otherStone.GetHalfValue(DominoHalfs.First))
-            firstHalfMatches.Add(new DominoMatch(this, otherStone, DominoHalfs.Second, DominoHalfs.First));
+            matches.Add(new DominoMatch(
+                this, otherStone,
+                DominoHalfs.Second,
+                DominoHalfs.First,
+                baseIndex,
+                otherStoneBaseIndex));
         if (_halfs.Item1 == otherStone.GetHalfValue(DominoHalfs.Second))
-            firstHalfMatches.Add(new DominoMatch(this, otherStone, DominoHalfs.First, DominoHalfs.Second));
+            matches.Add(new DominoMatch(
+                this,
+                otherStone,
+                DominoHalfs.First,
+                DominoHalfs.Second,
+                baseIndex,
+                otherStoneBaseIndex));
         if (_halfs.Item2 == otherStone.GetHalfValue(DominoHalfs.Second))
-            firstHalfMatches.Add(new DominoMatch(this, otherStone, DominoHalfs.Second, DominoHalfs.Second));
+            matches.Add(new DominoMatch(
+                this,
+                otherStone,
+                DominoHalfs.Second,
+                DominoHalfs.Second,
+                baseIndex,
+                otherStoneBaseIndex));
 
-        if (firstHalfMatches.Count == 0)
+        if (matches.Count == 0)
             return false;
         return true;
     }
@@ -51,5 +76,19 @@ public class Domino
         if (DominoHalfs.First == half)
             return _halfs.Item1;
         return _halfs.Item2;
+    }
+
+    public Tuple<Domino, bool> RotateIfNeeded(Tuple<Domino, bool> otherDomino)
+    {
+        var isRotateNeeded = true;
+        if (otherDomino.Item2 && otherDomino.Item1.GetHalfValue(DominoHalfs.First) == _halfs.Item1)
+        {
+            isRotateNeeded = false;
+        }
+        else if (otherDomino.Item1.GetHalfValue(DominoHalfs.Second) == _halfs.Item1)
+        {
+            isRotateNeeded = false;
+        }
+        return new Tuple<Domino, bool>(this, isRotateNeeded);
     }
 }

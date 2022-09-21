@@ -16,9 +16,6 @@ public class DominoCollection
     }
     protected List<Domino> _stones = new List<Domino>();
     protected List<DominoMatch>[] _matches;
-    private int[] _usedDominos;
-    private int? _startDominoInCycle;
-    private int? _endDominoInCycle;
     public DominoCollection(string rawSequence)
     {
         var match = _dominoRandomSequence.Match(rawSequence);
@@ -40,7 +37,8 @@ public class DominoCollection
             _matches[i] = new List<DominoMatch>();
             i++;
         }
-        _usedDominos = new int[stonesAmount];
+        _usedDominos = new DominoStates[stonesAmount];
+        _dominoIndexSequence = Enumerable.Repeat(-1, stonesAmount).ToArray();
         MatchDominos();
     }
 
@@ -51,7 +49,7 @@ public class DominoCollection
             for (var j = i + 1; j < _stones.Count; j++)
             {
                 var stonesMatches = new List<DominoMatch>();
-                if (_stones[i].TryMatchTo(_stones[j], out stonesMatches))
+                if (_stones[i].TryMatchTo(_stones[j], out stonesMatches, i, j))
                 {
                     _matches[i].AddRange(stonesMatches);
                     _matches[j].AddRange(stonesMatches);
@@ -72,13 +70,83 @@ public class DominoCollection
         return _matches[index].ToArray();
     }
 
-    // public string FindCycle()
-    // {
-    //     throw new NotImplementedException();
-    // }
+    private enum DominoStates
+    {
+        NotChecked,
+        Checking,
+        Checked
+    }
+    private DominoStates[] _usedDominos;
+    private int[] _dominoIndexSequence;
+    private int _startDominoInCycle;
+    private int _endDominoInCycle;
+    private DominoHalfs _endDominoHalf;
 
-    // private bool DominoDFC(int k, DominoHalfs enteredHalf)
-    // {
+    public string FindCycle()
+    {
+        var dominoAmount = _stones.Count();
+        _usedDominos = new DominoStates[dominoAmount];
+        _dominoIndexSequence = new int[dominoAmount];
+        _startDominoInCycle = -1;
+        for (var i = 0; i < dominoAmount; i++)
+        {
+            if (DominoDFC(i, DominoHalfs.First))
+                break;
+        }
+        if (_startDominoInCycle < 0)
+            throw new AggregateException("Couldn't find any cycles for dominos");
+        var dominoSequence = new List<Tuple<Domino, bool>>()
+        {
+            _stones[_startDominoInCycle].RotateIfNeeded(
+                new Tuple<Domino, bool>(_stones[_endDominoInCycle],
+                (_stones[_startDominoInCycle].GetHalfValue(DominoHalfs.First)
+                ==
+                _stones[_endDominoInCycle].GetHalfValue(_endDominoHalf))
+                ?
+                false
+                :
+                true))
+        };
+        for (var i = _endDominoInCycle; i != _startDominoInCycle; i = _dominoIndexSequence[i])
+        {
+            dominoSequence.Add(_stones[i].RotateIfNeeded(dominoSequence[^1]));
+        }
+        var cycle = new StringBuilder();
+        foreach (var domino in dominoSequence)
+        {
+            cycle.Append(domino.Item1.ToString(domino.Item2));
+            cycle.Append(" ");
+        }
+        return cycle.ToString().Trim();
+    }
 
-    // }
+    private bool DominoDFC(int enteredDominoIndex, DominoHalfs enteredHalf)
+    {
+        _usedDominos[enteredDominoIndex] = DominoStates.Checking;
+
+        foreach (var halfMatch in _matches[enteredDominoIndex])
+        {
+            if (enteredHalf != halfMatch.GetDominoHalfByBaseInd(enteredDominoIndex))
+            {
+                int otherDominoBaseIndex = halfMatch.GetOtherDominoBaseInd(enteredDominoIndex);
+                if (_usedDominos[otherDominoBaseIndex] == DominoStates.NotChecked)
+                {
+                    _dominoIndexSequence[otherDominoBaseIndex] = enteredDominoIndex;
+                    if (DominoDFC(
+                        otherDominoBaseIndex,
+                        halfMatch.GetDominoHalfByBaseInd(otherDominoBaseIndex)))
+                        return true;
+                }
+                else if (_usedDominos[otherDominoBaseIndex] == DominoStates.Checking)
+                {
+                    _endDominoInCycle = enteredDominoIndex;
+                    _startDominoInCycle = otherDominoBaseIndex;
+                    _endDominoHalf = enteredHalf == DominoHalfs.First ? DominoHalfs.Second : DominoHalfs.First;
+                    return true;
+                }
+            }
+        }
+        _usedDominos[enteredDominoIndex] = DominoStates.Checked;
+        return false;
+    }
 }

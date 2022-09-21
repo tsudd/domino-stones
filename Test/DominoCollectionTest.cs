@@ -98,4 +98,30 @@ public class DominoCollectionTest
             Assert.True(matches[i].Equals(expectedMatches[i]));
         }
     }
+
+    [Fact]
+    public void TestCycleCheck()
+    {
+        // Given
+        var dominoCollection = new DominoCollection("[2|1] [2|3] [1|3]");
+
+        // When
+        var ans = dominoCollection.FindCycle();
+
+        // Then
+        Assert.Equal("[1|2] [2|3] [3|1]", ans);
+    }
+
+    [Fact]
+    public void TestInvelidCycle()
+    {
+        // Given
+        var dominoCollection = new DominoCollection("[1|2] [4|1] [2|3]");
+
+        // When
+        Assert.Throws<AggregateException>(() =>
+        {
+            var ans = dominoCollection.FindCycle();
+        });
+    }
 }
