@@ -88,15 +88,13 @@ public class DominoCollection
         _usedDominos = new DominoStates[dominoAmount];
         _dominoIndexSequence = new int[dominoAmount];
         _startDominoInCircle = -1;
-        for (var i = 0; i < dominoAmount; i++)
-        {
-            if (DominoDFC(i, DominoHalfs.First))
-                break;
-        }
+
+        DominoDFC(0, DominoHalfs.First);
+
         if (_startDominoInCircle < 0)
-            throw new AggregateException("Couldn't find any circles for dominos");
+            throw new AggregateException("Couldn't find any circles for stones");
         if (AreAllDominosChecked() == false)
-            throw new AggregateException("It's impossible to build a circle with all dominos.");
+            throw new AggregateException("It's impossible to build a circle with all stones.");
         var dominoSequence = new List<Tuple<Domino, bool>>()
         {
             _stones[_startDominoInCircle].RotateIfNeeded(
