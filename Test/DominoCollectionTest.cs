@@ -57,15 +57,41 @@ public class DominoCollectionTest
         var dominoCollection = new DominoCollection(testSequence);
 
         var stones = dominoCollection.Stones.ToArray<Domino>();
-        var matches = dominoCollection.Matches.ToArray<DominoMatch>();
-
-        var expectedMatches = new[]{
+        var allMatches = new[]{
             new DominoMatch(stones[0], stones[1], DominoHalfs.First, DominoHalfs.First),
             new DominoMatch(stones[0], stones[2], DominoHalfs.Second, DominoHalfs.First),
             new DominoMatch(stones[1], stones[2], DominoHalfs.Second, DominoHalfs.Second),
         };
 
         //then
+        var matches = dominoCollection.GetDominoMatches(0).ToArray<DominoMatch>();
+
+        var expectedMatches = new DominoMatch[] {
+            allMatches[0],
+            allMatches[1]
+        };
+        Assert.Equal<int>(expectedMatches.Count(), matches.Count());
+        for (var i = 0; i < expectedMatches.Count(); i++)
+        {
+            Assert.True(matches[i].Equals(expectedMatches[i]));
+        }
+
+        matches = dominoCollection.GetDominoMatches(1).ToArray<DominoMatch>();
+        expectedMatches = new DominoMatch[] {
+            allMatches[0],
+            allMatches[2],
+        };
+        Assert.Equal<int>(expectedMatches.Count(), matches.Count());
+        for (var i = 0; i < expectedMatches.Count(); i++)
+        {
+            Assert.True(matches[i].Equals(expectedMatches[i]));
+        }
+
+        matches = dominoCollection.GetDominoMatches(2).ToArray<DominoMatch>();
+        expectedMatches = new DominoMatch[] {
+            allMatches[1],
+            allMatches[2],
+        };
         Assert.Equal<int>(expectedMatches.Count(), matches.Count());
         for (var i = 0; i < expectedMatches.Count(); i++)
         {
