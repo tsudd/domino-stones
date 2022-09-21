@@ -78,46 +78,60 @@ public class DominoCollection
     }
     private DominoStates[] _usedDominos;
     private int[] _dominoIndexSequence;
-    private int _startDominoInCycle;
-    private int _endDominoInCycle;
+    private int _startDominoInCircle;
+    private int _endDominoInCircle;
     private DominoHalfs _endDominoHalf;
 
-    public string FindCycle()
+    public string FindCircle()
     {
         var dominoAmount = _stones.Count();
         _usedDominos = new DominoStates[dominoAmount];
         _dominoIndexSequence = new int[dominoAmount];
-        _startDominoInCycle = -1;
+        _startDominoInCircle = -1;
         for (var i = 0; i < dominoAmount; i++)
         {
             if (DominoDFC(i, DominoHalfs.First))
                 break;
         }
-        if (_startDominoInCycle < 0)
-            throw new AggregateException("Couldn't find any cycles for dominos");
+        if (_startDominoInCircle < 0)
+            throw new AggregateException("Couldn't find any circles for dominos");
+        if (AreAllDominosChecked() == false)
+            throw new AggregateException("It's impossible to build a circle with all dominos.");
         var dominoSequence = new List<Tuple<Domino, bool>>()
         {
-            _stones[_startDominoInCycle].RotateIfNeeded(
-                new Tuple<Domino, bool>(_stones[_endDominoInCycle],
-                (_stones[_startDominoInCycle].GetHalfValue(DominoHalfs.First)
+            _stones[_startDominoInCircle].RotateIfNeeded(
+                new Tuple<Domino, bool>(_stones[_endDominoInCircle],
+                (_stones[_startDominoInCircle].GetHalfValue(DominoHalfs.First)
                 ==
-                _stones[_endDominoInCycle].GetHalfValue(_endDominoHalf))
+                _stones[_endDominoInCircle].GetHalfValue(_endDominoHalf))
                 ?
                 false
                 :
                 true))
         };
-        for (var i = _endDominoInCycle; i != _startDominoInCycle; i = _dominoIndexSequence[i])
+        for (var i = _endDominoInCircle; i != _startDominoInCircle; i = _dominoIndexSequence[i])
         {
             dominoSequence.Add(_stones[i].RotateIfNeeded(dominoSequence[^1]));
         }
-        var cycle = new StringBuilder();
+        var circle = new StringBuilder();
         foreach (var domino in dominoSequence)
         {
-            cycle.Append(domino.Item1.ToString(domino.Item2));
-            cycle.Append(" ");
+            circle.Append(domino.Item1.ToString(domino.Item2));
+            circle.Append(" ");
         }
-        return cycle.ToString().Trim();
+        return circle.ToString().Trim();
+    }
+
+    private bool AreAllDominosChecked()
+    {
+        foreach (var use in _usedDominos)
+        {
+            if (use == DominoStates.NotChecked)
+            {
+                return false;
+            }
+        }
+        return true;
     }
 
     private bool DominoDFC(int enteredDominoIndex, DominoHalfs enteredHalf)
@@ -137,10 +151,10 @@ public class DominoCollection
                         halfMatch.GetDominoHalfByBaseInd(otherDominoBaseIndex)))
                         return true;
                 }
-                else if (_usedDominos[otherDominoBaseIndex] == DominoStates.Checking)
+                else if (_usedDominos[otherDominoBaseIndex] == DominoStates.Checking && AreAllDominosChecked())
                 {
-                    _endDominoInCycle = enteredDominoIndex;
-                    _startDominoInCycle = otherDominoBaseIndex;
+                    _endDominoInCircle = enteredDominoIndex;
+                    _startDominoInCircle = otherDominoBaseIndex;
                     _endDominoHalf = enteredHalf == DominoHalfs.First ? DominoHalfs.Second : DominoHalfs.First;
                     return true;
                 }
