@@ -89,11 +89,12 @@ public class DominoCollection
         _dominoIndexSequence = new int[dominoAmount];
         _startDominoInCircle = -1;
 
-        DominoDFC(0, DominoHalfs.First);
+        var search = DominoDFS(0, DominoHalfs.First);
+
 
         if (_startDominoInCircle < 0)
             throw new AggregateException("Couldn't find any circles for stones");
-        if (AreAllDominosChecked() == false)
+        if (!AreAllDominosChecked() || !search)
             throw new AggregateException("It's impossible to build a circle with all stones.");
         var dominoSequence = new List<Tuple<Domino, bool>>()
         {
@@ -111,6 +112,7 @@ public class DominoCollection
         {
             dominoSequence.Add(_stones[i].RotateIfNeeded(dominoSequence[^1]));
         }
+
         var circle = new StringBuilder();
         foreach (var domino in dominoSequence)
         {
@@ -132,7 +134,7 @@ public class DominoCollection
         return true;
     }
 
-    private bool DominoDFC(int enteredDominoIndex, DominoHalfs enteredHalf)
+    private bool DominoDFS(int enteredDominoIndex, DominoHalfs enteredHalf)
     {
         _usedDominos[enteredDominoIndex] = DominoStates.Checking;
 
@@ -144,13 +146,16 @@ public class DominoCollection
                 if (_usedDominos[otherDominoBaseIndex] == DominoStates.NotChecked)
                 {
                     _dominoIndexSequence[otherDominoBaseIndex] = enteredDominoIndex;
-                    if (DominoDFC(
+                    if (DominoDFS(
                         otherDominoBaseIndex,
                         halfMatch.GetDominoHalfByBaseInd(otherDominoBaseIndex)))
                         return true;
                 }
-                else if (_usedDominos[otherDominoBaseIndex] == DominoStates.Checking && AreAllDominosChecked())
+                else if (
+                    _usedDominos[otherDominoBaseIndex] == DominoStates.Checking && AreAllDominosChecked())
                 {
+                    if (_dominoIndexSequence[enteredDominoIndex] == otherDominoBaseIndex)
+                        continue;
                     _endDominoInCircle = enteredDominoIndex;
                     _startDominoInCircle = otherDominoBaseIndex;
                     _endDominoHalf = enteredHalf == DominoHalfs.First ? DominoHalfs.Second : DominoHalfs.First;

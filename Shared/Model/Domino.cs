@@ -42,19 +42,21 @@ public class Domino
                 DominoHalfs.First,
                 baseIndex,
                 otherStoneBaseIndex));
-        if (_halfs.Item2 == otherStone.GetHalfValue(DominoHalfs.First))
-            matches.Add(new DominoMatch(
-                this, otherStone,
-                DominoHalfs.Second,
-                DominoHalfs.First,
-                baseIndex,
-                otherStoneBaseIndex));
         if (_halfs.Item1 == otherStone.GetHalfValue(DominoHalfs.Second))
             matches.Add(new DominoMatch(
                 this,
                 otherStone,
                 DominoHalfs.First,
                 DominoHalfs.Second,
+                baseIndex,
+                otherStoneBaseIndex));
+        // if (IsSymmetric())
+        //     return true;
+        if (_halfs.Item2 == otherStone.GetHalfValue(DominoHalfs.First))
+            matches.Add(new DominoMatch(
+                this, otherStone,
+                DominoHalfs.Second,
+                DominoHalfs.First,
                 baseIndex,
                 otherStoneBaseIndex));
         if (_halfs.Item2 == otherStone.GetHalfValue(DominoHalfs.Second))

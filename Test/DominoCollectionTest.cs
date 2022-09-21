@@ -129,6 +129,15 @@ public class DominoCollectionTest
         // Then
         Assert.Equal("[1|1] [1|1] [1|1]", ans);
 
+        // Given
+        dominoCollection = new DominoCollection("[1|1] [1|2] [1|2] [1|1]");
+
+        // When
+        ans = dominoCollection.FindCircle();
+
+        // Then
+        Assert.Equal("[1|1] [1|1] [1|2] [2|1]", ans);
+
     }
 
     [Fact]
@@ -154,6 +163,15 @@ public class DominoCollectionTest
 
         // Given
         dominoCollection = new DominoCollection("[1|3] [3|1] [6|2] [2|6]");
+
+        // When
+        Assert.Throws<AggregateException>(() =>
+        {
+            var ans = dominoCollection.FindCircle();
+        });
+
+        // Given
+        dominoCollection = new DominoCollection("[1|2] [3|3] [3|5] [5|2]");
 
         // When
         Assert.Throws<AggregateException>(() =>
