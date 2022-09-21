@@ -8,7 +8,8 @@ public enum DominoHalfs
 public class DominoMatch
 {
     public Tuple<Domino, Domino> Dominos { get; init; }
-    private Tuple<DominoHalfs, DominoHalfs> _matchedHalfs;
+    public DominoHalfs FirstDominoHalf { get; init; }
+    public DominoHalfs SecondDominoHalf { get; init; }
 
     public DominoMatch(
         Domino firstStone,
@@ -17,7 +18,8 @@ public class DominoMatch
         DominoHalfs secondStoneHalf)
     {
         Dominos = new Tuple<Domino, Domino>(firstStone, secondStone);
-        _matchedHalfs = new Tuple<DominoHalfs, DominoHalfs>(firstStoneHalf, secondStoneHalf);
+        FirstDominoHalf = firstStoneHalf;
+        SecondDominoHalf = secondStoneHalf;
     }
 
     public override bool Equals(object? obj)
@@ -32,6 +34,6 @@ public class DominoMatch
     public override int GetHashCode()
     {
         return ($"{Dominos.Item1.ToString()}" +
-            $"{Dominos.Item2.ToString()}{_matchedHalfs.Item1}{_matchedHalfs.Item2}").GetHashCode();
+            $"{Dominos.Item2.ToString()}{FirstDominoHalf}{SecondDominoHalf}").GetHashCode();
     }
 }

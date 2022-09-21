@@ -16,13 +16,19 @@ public class DominoCollection
     }
     protected List<Domino> _stones = new List<Domino>();
     protected List<DominoMatch>[] _matches;
+    private int[] _usedDominos;
+    private int? _startDominoInCycle;
+    private int? _endDominoInCycle;
     public DominoCollection(string rawSequence)
     {
         var match = _dominoRandomSequence.Match(rawSequence);
         if (match.Length != rawSequence.Length)
             throw new ArgumentException("Incorrect format of dominos stones sequence");
+
         var rawStones = match.Groups[2].Captures;
-        _matches = new List<DominoMatch>[rawStones.Count()];
+
+        var stonesAmount = rawStones.Count();
+        _matches = new List<DominoMatch>[stonesAmount];
         var i = 0;
         foreach (Capture rawStone in rawStones)
         {
@@ -34,6 +40,7 @@ public class DominoCollection
             _matches[i] = new List<DominoMatch>();
             i++;
         }
+        _usedDominos = new int[stonesAmount];
         MatchDominos();
     }
 
@@ -66,6 +73,11 @@ public class DominoCollection
     }
 
     // public string FindCycle()
+    // {
+    //     throw new NotImplementedException();
+    // }
+
+    // private bool DominoDFC(int k, DominoHalfs enteredHalf)
     // {
 
     // }

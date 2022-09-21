@@ -27,19 +27,21 @@ public class Domino
         return false;
     }
 
-    public bool TryMatchTo(Domino otherStone, out List<DominoMatch> matches)
+    public bool TryMatchTo(
+        Domino otherStone,
+        out List<DominoMatch> firstHalfMatches)
     {
-        matches = new List<DominoMatch>();
+        firstHalfMatches = new List<DominoMatch>();
         if (_halfs.Item1 == otherStone.GetHalfValue(DominoHalfs.First))
-            matches.Add(new DominoMatch(this, otherStone, DominoHalfs.First, DominoHalfs.First));
+            firstHalfMatches.Add(new DominoMatch(this, otherStone, DominoHalfs.First, DominoHalfs.First));
         if (_halfs.Item2 == otherStone.GetHalfValue(DominoHalfs.First))
-            matches.Add(new DominoMatch(this, otherStone, DominoHalfs.Second, DominoHalfs.First));
+            firstHalfMatches.Add(new DominoMatch(this, otherStone, DominoHalfs.Second, DominoHalfs.First));
         if (_halfs.Item1 == otherStone.GetHalfValue(DominoHalfs.Second))
-            matches.Add(new DominoMatch(this, otherStone, DominoHalfs.First, DominoHalfs.Second));
+            firstHalfMatches.Add(new DominoMatch(this, otherStone, DominoHalfs.First, DominoHalfs.Second));
         if (_halfs.Item2 == otherStone.GetHalfValue(DominoHalfs.Second))
-            matches.Add(new DominoMatch(this, otherStone, DominoHalfs.Second, DominoHalfs.Second));
+            firstHalfMatches.Add(new DominoMatch(this, otherStone, DominoHalfs.Second, DominoHalfs.Second));
 
-        if (matches.Count == 0)
+        if (firstHalfMatches.Count == 0)
             return false;
         return true;
     }
